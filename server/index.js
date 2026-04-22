@@ -1,0 +1,76 @@
+import "dotenv/config";
+import cors from "cors";
+import express from "express";
+import session from "express-session";
+import mongoose from "mongoose";
+import Hello from "./Hello.js";
+import Lab5 from "./Lab5/index.js";
+import AssignmentsRoutes from "./kambaz/assignments/routes.js";
+import CourseRoutes from "./kambaz/courses/routes.js";
+import EnrollmentsRoutes from "./kambaz/enrollments/routes.js";
+import ModulesRoutes from "./kambaz/modules/routes.js";
+import PazzaRoutes from "./kambaz/pazza/routes.js";
+import QuizzesRoutes from "./kambaz/quizzes/routes.js";
+import UserRoutes from "./kambaz/users/routes.js";
+
+const app = express();
+const CONNECTION_STRING = process.env.DATABASE_CONNECTION_STRING;
+const isDevelopment = process.env.SERVER_ENV === "development";
+const sessionCookieName = "kambaz.sid";
+const sessionCookieOptions = isDevelopment
+  ? {}
+  : {
+      sameSite: "none",
+      secure: true,
+    };
+
+app.use(
+  cors({
+    credentials: true,
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
+  }),
+);
+
+const sessionOptions = {
+  name: sessionCookieName,
+  secret: process.env.SESSION_SECRET || "kambaz",
+  resave: false,
+  saveUninitialized: false,
+  cookie: sessionCookieOptions,
+};
+
+if (!isDevelopment) {
+  sessionOptions.proxy = true;
+}
+
+app.use(session(sessionOptions));
+app.use(express.json());
+
+UserRoutes(app);
+CourseRoutes(app);
+EnrollmentsRoutes(app);
+ModulesRoutes(app);
+PazzaRoutes(app);
+QuizzesRoutes(app);
+AssignmentsRoutes(app);
+Lab5(app);
+Hello(app);
+
+const port = process.env.PORT || 4000;
+
+async function startServer() {
+  try {
+    if (!CONNECTION_STRING) {
+      throw new Error("DATABASE_CONNECTION_STRING is required.");
+    }
+    await mongoose.connect(CONNECTION_STRING);
+    app.listen(port, () => {
+      console.log(`Kambaz server listening on port ${port}`);
+    });
+  } catch (error) {
+    console.error("Failed to connect to MongoDB", error);
+    process.exit(1);
+  }
+}
+
+startServer();

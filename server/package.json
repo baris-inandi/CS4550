@@ -1,0 +1,23 @@
+{
+  "name": "kambaz-node-server-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Node.js HTTP web server for the Kambaz application",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "express-session": "^1.19.0",
+    "mongoose": "^9.4.1",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.3"
+  }
+}
